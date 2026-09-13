@@ -41,3 +41,8 @@ _run.log
 run_state.json
 handout.md
 handout_active.md
+
+# DP-E2E-BROWSER-TESTING
+e2e/artifacts/
+playwright-report/
+test-results/
