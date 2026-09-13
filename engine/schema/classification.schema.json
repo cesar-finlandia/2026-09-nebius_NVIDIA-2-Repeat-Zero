@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "repeatzero://schema/classification",
+  "title": "TicketClassificationLLM",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["label", "taxonomy", "confidence", "rationale"],
+  "properties": {
+    "label": { "type": "string", "enum": ["repeat", "novel"] },
+    "taxonomy": { "type": ["string", "null"], "enum": ["password-reset", "vpn-connect", "wifi-onboarding", "printer-queue", "software-install", "email-quota", "sso-app-access", "laptop-hardware", "license-seat", "mfa-device-lost", "data-access-request", "security-incident", null] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "rationale": { "type": "string", "minLength": 1, "maxLength": 600 }
+  }
+}
