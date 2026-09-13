@@ -1,0 +1,1 @@
+{"plans":["DP-CONTRACTS","DP-TFCLIENT","DP-TAVILY","DP-CORPUS","DP-CLASSIFY","DP-DRAFT","DP-POLICY","DP-PIPELINE","DP-COSTLEDGER","DP-API","DP-UI","DP-VERIFY","DP-SUBMIT","DP-DEMO"],"plans_total":14,"report_command":"npx vite-node src/dev-tooling/track/cli.ts --config config/track.json","version":"1.0.0"}

@@ -19,6 +19,7 @@ import {
   type CollectablePublisher,
 } from "../../platform/transport/publisher.js";
 import type { EventEnvelope } from "../../platform/transport/event-envelope.js";
+// @ts-expect-error chassis dev/mock runner not present in this working copy
 import { runMock } from "../../dev/mock/runner.js";
 import { createGoldenCache } from "../../resilience/cache/index.js";
 import type { DemodriveDataSource } from "./script.js";
