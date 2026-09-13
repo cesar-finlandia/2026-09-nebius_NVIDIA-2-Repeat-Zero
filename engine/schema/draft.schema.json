@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResolutionDraftModelOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["body", "suggested_first_action", "cited_indices"],
+  "properties": {
+    "body": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "suggested_first_action": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "cited_indices": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } }
+  }
+}
