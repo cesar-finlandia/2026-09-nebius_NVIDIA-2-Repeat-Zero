@@ -1,0 +1,8 @@
+FROM node:20-slim
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+COPY . .
+RUN npm run build:ui
+EXPOSE 3000
+CMD ["node", "scripts/serve.js"]

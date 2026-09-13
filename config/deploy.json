@@ -1,0 +1,1 @@
+{"entry":"scripts/serve.js","job":{"entry":"scripts/reindex-job.js","schedule":"0 3 * * *","timezone":"UTC"},"port":3000,"provider":"docker"}
