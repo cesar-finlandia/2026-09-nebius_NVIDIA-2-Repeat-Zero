@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "base_url": "http://127.0.0.1:8787",
+  "ticket_id": "T-0007",
+  "steps": [
+    {
+      "seq": 1,
+      "action": "open",
+      "target": "/",
+      "expect_step_id": "ticket-intake",
+      "note": "queue visible"
+    },
+    {
+      "seq": 2,
+      "action": "submit",
+      "target": "/api/tickets",
+      "expect_step_id": "classify",
+      "note": "repeat ticket"
+    },
+    {
+      "seq": 3,
+      "action": "observe",
+      "target": "/api/stream",
+      "expect_step_id": "ground",
+      "note": "citations appear"
+    },
+    {
+      "seq": 4,
+      "action": "approve",
+      "target": "/api/tickets",
+      "expect_step_id": "dispatch",
+      "note": "auto-send"
+    },
+    {
+      "seq": 5,
+      "action": "submit",
+      "target": "/api/tickets",
+      "expect_step_id": "escalate",
+      "note": "novel ticket"
+    },
+    {
+      "seq": 6,
+      "action": "open",
+      "target": "/api/savings",
+      "expect_step_id": "ledger",
+      "note": "dashboard"
+    }
+  ]
+}

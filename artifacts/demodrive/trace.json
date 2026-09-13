@@ -1,0 +1,225 @@
+[
+  {
+    "step_id": "ticket-intake",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:18.221Z",
+    "sequence": 0,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "ticket-intake",
+    "status": "done",
+    "payload": {
+      "ticket_id": "t-repeat-01",
+      "subject": "Locked out after password reset link expired"
+    },
+    "timestamp": "2026-09-13T23:30:18.222Z",
+    "sequence": 1,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "retrieve",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:18.222Z",
+    "sequence": 2,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "retrieve",
+    "status": "done",
+    "payload": {
+      "candidate_count": 0,
+      "top_runbook_id": null
+    },
+    "timestamp": "2026-09-13T23:30:18.222Z",
+    "sequence": 3,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "classify",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:18.222Z",
+    "sequence": 4,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "classify",
+    "status": "done",
+    "payload": {
+      "label": "novel",
+      "taxonomy": null,
+      "confidence": 0,
+      "rationale": "classifier degraded: primary_failed",
+      "degraded": true,
+      "degradation_reason": "primary_failed"
+    },
+    "timestamp": "2026-09-13T23:30:20.543Z",
+    "sequence": 5,
+    "trace_id": "demodrive-t7",
+    "degraded": true
+  },
+  {
+    "step_id": "ground",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:20.543Z",
+    "sequence": 6,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "ground",
+    "status": "done",
+    "payload": {
+      "citations": [],
+      "skipped": true
+    },
+    "timestamp": "2026-09-13T23:30:20.543Z",
+    "sequence": 7,
+    "trace_id": "demodrive-t7",
+    "degraded": true
+  },
+  {
+    "step_id": "draft",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:20.543Z",
+    "sequence": 8,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "draft",
+    "status": "done",
+    "payload": {
+      "kind": "resolution",
+      "body": "",
+      "citations": [],
+      "suggested_first_action": "",
+      "valid": false,
+      "invalid_reason": "no_citation",
+      "degraded": true
+    },
+    "timestamp": "2026-09-13T23:30:20.543Z",
+    "sequence": 9,
+    "trace_id": "demodrive-t7",
+    "degraded": true
+  },
+  {
+    "step_id": "policy-gate",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:20.543Z",
+    "sequence": 10,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "policy-gate",
+    "status": "done",
+    "payload": {
+      "action": "escalate",
+      "reason_code": "degraded_input",
+      "explanation": "Input is degraded; escalating for human review.",
+      "thresholds_applied": {
+        "confidence": 0.85,
+        "min_citations": 1,
+        "risk": "high"
+      }
+    },
+    "timestamp": "2026-09-13T23:30:20.544Z",
+    "sequence": 11,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "ledger",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:20.544Z",
+    "sequence": 12,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "ledger",
+    "status": "done",
+    "payload": {
+      "trace_id": "demodrive-t7",
+      "ticket_id": "t-repeat-01",
+      "calls": [],
+      "total_input_tokens": 0,
+      "total_output_tokens": 0,
+      "estimated_cost_usd": 0,
+      "tavily_calls": 0
+    },
+    "timestamp": "2026-09-13T23:30:20.544Z",
+    "sequence": 13,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "escalate",
+    "status": "started",
+    "payload": {},
+    "timestamp": "2026-09-13T23:30:20.544Z",
+    "sequence": 14,
+    "trace_id": "demodrive-t7"
+  },
+  {
+    "step_id": "escalate",
+    "status": "done",
+    "payload": {
+      "trace_id": "demodrive-t7",
+      "ticket": {
+        "body": "I tried the reset link twice and it says expired. The self-service portal still shows locked out. Please help, I am locked out.",
+        "created_at": "2026-09-01T09:00:00.000Z",
+        "expected_label": "repeat",
+        "expected_taxonomy": "password-reset",
+        "expected_top_runbook": "rb-password-reset",
+        "id": "t-repeat-01",
+        "requester": "ana@example.internal",
+        "subject": "Locked out after password reset link expired"
+      },
+      "classification": {
+        "label": "novel",
+        "taxonomy": null,
+        "confidence": 0,
+        "rationale": "classifier degraded: primary_failed",
+        "degraded": true,
+        "degradation_reason": "primary_failed"
+      },
+      "citations": [],
+      "draft": {
+        "kind": "resolution",
+        "body": "",
+        "citations": [],
+        "suggested_first_action": "",
+        "valid": false,
+        "invalid_reason": "no_citation",
+        "degraded": true
+      },
+      "decision": {
+        "action": "escalate",
+        "reason_code": "degraded_input",
+        "explanation": "Input is degraded; escalating for human review.",
+        "thresholds_applied": {
+          "confidence": 0.85,
+          "min_citations": 1,
+          "risk": "high"
+        }
+      },
+      "ledger": {
+        "trace_id": "demodrive-t7",
+        "ticket_id": "t-repeat-01",
+        "calls": [],
+        "total_input_tokens": 0,
+        "total_output_tokens": 0,
+        "estimated_cost_usd": 0,
+        "tavily_calls": 0
+      },
+      "degraded": true
+    },
+    "timestamp": "2026-09-13T23:30:20.544Z",
+    "sequence": 15,
+    "trace_id": "demodrive-t7",
+    "degraded": true
+  }
+]
