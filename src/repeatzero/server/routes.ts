@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { isDegradedResult, validate } from "../../resilience/index.js";
 import { runTriage } from "../pipeline/index.js";
 import { listModels } from "../tokenfactory/client.js";
@@ -43,6 +44,27 @@ export async function handler(req: Request): Promise<Response> {
     const method: string = req.method.toUpperCase();
     if (method === "OPTIONS") {
       return new Response("", { status: 204, headers });
+    }
+    if (method === "GET" && (path === "/" || path === "/index.html")) {
+      const distIndex: string = join(process.cwd(), "dist", "index.html");
+      if (existsSync(distIndex)) {
+        const html: string = readFileSync(distIndex, "utf8");
+        return new Response(html, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8", ...headers } });
+      }
+    }
+    if (method === "GET" && path.startsWith("/assets/")) {
+      const filePath: string = join(process.cwd(), "dist", path.slice(1));
+      if (existsSync(filePath)) {
+        const data: Buffer = readFileSync(filePath) as Buffer;
+        const contentType: string = path.endsWith(".js")
+          ? "text/javascript"
+          : path.endsWith(".css")
+            ? "text/css"
+            : path.endsWith(".woff2")
+              ? "font/woff2"
+              : "application/octet-stream";
+        return new Response(data as BodyInit, { status: 200, headers: { "Content-Type": contentType, ...headers } });
+      }
     }
     if (method === "GET" && path === "/healthz") {
       const now: number = Date.now();

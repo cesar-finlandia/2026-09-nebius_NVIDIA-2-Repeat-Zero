@@ -8,6 +8,12 @@ import { defineConfig } from "vite";
 const root = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
+  build: {
+    outDir: "dist",
+    rollupOptions: {
+      input: "index.html",
+    },
+  },
   resolve: {
     alias: {
       src: `${root}src`,
