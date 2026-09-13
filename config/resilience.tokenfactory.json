@@ -1,0 +1,19 @@
+{
+  "timeout_ms": 30000,
+  "retries": 2,
+  "backoff": {
+    "policy": "exponential",
+    "base_ms": 500
+  },
+  "fallback_chain": {
+    "order": [
+      "cache",
+      "none"
+    ]
+  },
+  "cache_key_strategy": "auto",
+  "listModels": {
+    "timeout_ms": 15000,
+    "retries": 1
+  }
+}
