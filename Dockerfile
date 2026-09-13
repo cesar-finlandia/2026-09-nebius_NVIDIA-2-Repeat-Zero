@@ -5,4 +5,4 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 COPY . .
 RUN npm run build:ui
 EXPOSE 3000
-CMD ["node", "scripts/serve.js"]
+CMD ["npx", "vite-node", "scripts/serve.ts"]
