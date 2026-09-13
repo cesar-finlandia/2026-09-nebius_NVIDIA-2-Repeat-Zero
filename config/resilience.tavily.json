@@ -1,0 +1,1 @@
+{"backoff":{"base_ms":400,"policy":"exponential"},"fallback_chain":{"order":["cache","none"]},"retries":1,"timeout_ms":12000}
