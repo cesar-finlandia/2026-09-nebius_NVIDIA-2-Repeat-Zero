@@ -3,7 +3,6 @@ import type * as React from "react";
 import { useEventStream } from "src/platform/transport";
 import { withResilience } from "src/resilience";
 import type { DegradedResult } from "src/resilience";
-import { setTheme } from "src/platform/ui";
 import type { EventEnvelope } from "src/platform/transport";
 import type { TriageResult } from "../types.js";
 import { applyTheme, initialTheme } from "./theme.js";
@@ -47,7 +46,6 @@ export function App(props: AppProps): React.JSX.Element {
 
   useEffect(() => {
     applyTheme(initialTheme());
-    setTheme("operator");
   }, []);
 
   const stream = useEventStream({
@@ -55,7 +53,23 @@ export function App(props: AppProps): React.JSX.Element {
     transport: "sse",
   });
 
-  const envelopes: EventEnvelope[] = stream.envelopes;
+  const postedEnvelopes: EventEnvelope[] = useMemo(() => {
+    const out: EventEnvelope[] = [];
+    for (const r of queue) {
+      const withEnv = r as TriageResult & { envelopes?: EventEnvelope[] };
+      if (Array.isArray(withEnv.envelopes)) {
+        for (const e of withEnv.envelopes) {
+          out.push(e);
+        }
+      }
+    }
+    return out;
+  }, [queue]);
+
+  const envelopes: EventEnvelope[] = useMemo(() => {
+    if (stream.envelopes.length > 0) return stream.envelopes;
+    return postedEnvelopes;
+  }, [stream.envelopes, postedEnvelopes]);
 
   useEffect(() => {
     if (envelopes.length === 0 || firstEnvelopeAt !== null) return;

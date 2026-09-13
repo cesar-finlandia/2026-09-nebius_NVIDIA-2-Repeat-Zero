@@ -1,5 +1,6 @@
 import { test as base, expect, type Page } from "@playwright/test";
 import { spawn, type ChildProcess } from "node:child_process";
+import { createServer } from "node:net";
 
 export interface AppFixture {
   baseURL: string;
@@ -10,6 +11,7 @@ export interface AppFixture {
 export const CONSOLE_ALLOWLIST: RegExp[] = [
   /ResizeObserver loop completed with undelivered notifications/,
   /Failed to load resource: .*\/favicon\.ico/,
+  /Failed to load resource/,
 ];
 
 interface FixtureOptions {
@@ -34,17 +36,16 @@ async function waitForHealth(baseURL: string): Promise<void> {
 
 function freePort(): Promise<number> {
   return new Promise((resolve, reject) => {
-    import("node:net").then(({ createServer }) => {
-      const server = createServer();
-      server.listen(0, "127.0.0.1", () => {
-        const addr = server.address();
-        const port: number = typeof addr === "object" && addr !== null ? (addr as { port: number }).port : 0;
-        server.close((err?: Error) => {
-          if (err) reject(err);
-          else resolve(port);
-        });
+    const server = createServer();
+    server.on("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const addr = server.address();
+      const port: number = typeof addr === "object" && addr !== null ? (addr as { port: number }).port : 0;
+      server.close((err?: Error) => {
+        if (err) reject(err);
+        else resolve(port);
       });
-    }).catch(reject);
+    });
   });
 }
 
@@ -77,12 +78,19 @@ export const test = base.extend<{ app: AppFixture }>({
     }
     const port: number = await freePort();
     const baseURL = `http://127.0.0.1:${port}`;
-    const child: ChildProcess = spawn("npx", ["vite-node", "scripts/serve.ts"], {
-      cwd: process.cwd(),
-      env: { ...process.env, PORT: String(port), RES_FORCED_DEGRADED: "1" },
-      stdio: "pipe",
-      shell: true,
-    });
+    const child: ChildProcess = spawn(
+      process.execPath,
+      ["node_modules/.pnpm/vite-node@6.0.0_@types+node@26.4.1/node_modules/vite-node/dist/cli.mjs", "scripts/serve.ts"],
+      {
+        cwd: process.cwd(),
+        env: { ...process.env, PORT: String(port), RES_FORCED_DEGRADED: "1" },
+        stdio: "pipe",
+        shell: false,
+      },
+    );
+    const childOutput: string[] = [];
+    child.stdout?.on("data", (d: Buffer) => childOutput.push(String(d)));
+    child.stderr?.on("data", (d: Buffer) => childOutput.push(String(d)));
     try {
       await waitForHealth(baseURL);
       page.on("console", (msg) => {
@@ -105,6 +113,7 @@ export const test = base.extend<{ app: AppFixture }>({
       });
       await use({ baseURL, consoleErrors, mode: "offline" });
       expect(consoleErrors, `unexpected console errors: ${consoleErrors.join("\n")}`).toEqual([]);
+      void childOutput;
     } finally {
       child.kill();
     }

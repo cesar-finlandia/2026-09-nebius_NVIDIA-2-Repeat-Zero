@@ -17,7 +17,7 @@ export function QueueView(props: QueueViewProps): React.JSX.Element {
     : props.rows.filter((r) => `${r.subject} ${r.ticketId} ${r.taxonomyId}`.toLowerCase().includes(needle));
   if (props.rows.length === 0) {
     return (
-      <section aria-label="Ticket queue">
+      <section aria-label="Ticket queue" role="region">
         <h1 className="h1">No tickets yet.</h1>
         <p className="small">Load the sample queue to watch a shift&apos;s worth of triage in about a minute.</p>
         <input aria-label="Filter tickets" value={props.filter} onChange={(e) => props.onFilter(e.target.value)} />
@@ -26,14 +26,14 @@ export function QueueView(props: QueueViewProps): React.JSX.Element {
   }
   if (filtered.length === 0) {
     return (
-      <section aria-label="Ticket queue">
+      <section aria-label="Ticket queue" role="region">
         <input aria-label="Filter tickets" value={props.filter} onChange={(e) => props.onFilter(e.target.value)} />
         <p className="small">No tickets match this filter.</p>
       </section>
     );
   }
   return (
-    <section aria-label="Ticket queue">
+    <section aria-label="Ticket queue" role="region">
       <input aria-label="Filter tickets" value={props.filter} onChange={(e) => props.onFilter(e.target.value)} />
       <table className="rz-queue" aria-label="Ticket queue">
         <thead>

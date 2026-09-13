@@ -9,7 +9,7 @@ export interface EscalationInboxViewProps {
 export function EscalationInboxView(props: EscalationInboxViewProps): React.JSX.Element {
   if (props.items.length === 0) {
     return (
-      <section aria-label="Escalations">
+      <section aria-label="Escalations" role="region">
         <h1 className="h1">Nothing needs you right now.</h1>
         <p className="small">Escalations appear here when the policy engine is not confident enough to send.</p>
       </section>
@@ -23,7 +23,7 @@ export function EscalationInboxView(props: EscalationInboxViewProps): React.JSX.
     groups.set(key, bucket);
   }
   return (
-    <section aria-label="Escalations">
+    <section aria-label="Escalations" role="region">
       {[...groups.entries()].map(([reason, items]) => (
         <div key={reason}>
           <h3 className="h3">

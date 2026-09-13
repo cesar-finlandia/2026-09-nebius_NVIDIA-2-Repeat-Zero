@@ -74,6 +74,8 @@ export function selectQueueRows(envelopes: EventEnvelope[], queue: TriageResult[
     let state: QueueRow["state"];
     if (terminal === "dispatch") state = "sent";
     else if (terminal === "escalate") state = "escalated";
+    else if (result?.decision.action === "auto_send") state = "sent";
+    else if (result?.decision.action === "escalate") state = "escalated";
     else if (degraded || envs.some((e) => isDegradedEnvelope(e))) state = "unverified";
     else if (envs.length > 0) state = "working";
     else state = "unverified";

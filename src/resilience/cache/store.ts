@@ -253,10 +253,18 @@ function atomicWrite(target: string, data: string): void {
 //#region Factory
 
 export function createGoldenCache(rootDir?: string): GoldenCache {
-  const root =
-    rootDir !== undefined && rootDir !== "" ? rootDir
-    : process.env["GOLDEN_CACHE_DIR"] !== undefined && process.env["GOLDEN_CACHE_DIR"] !== "" ? process.env["GOLDEN_CACHE_DIR"]
-    : pathMod!.join(process.cwd(), ".cache", "golden");
+  // Browser guard: outside Node the stdlib bindings are null, so skip
+  // filesystem-backed defaults (createGoldenCache is reached during React
+  // render via withResilience; defaults must not touch pathMod/process).
+  let root: string;
+  if (typeof process === "undefined" || !pathMod) {
+    root = rootDir !== undefined && rootDir !== "" ? rootDir : ".cache/golden";
+  } else {
+    root =
+      rootDir !== undefined && rootDir !== "" ? rootDir
+      : process.env["GOLDEN_CACHE_DIR"] !== undefined && process.env["GOLDEN_CACHE_DIR"] !== "" ? process.env["GOLDEN_CACHE_DIR"]
+      : pathMod.join(process.cwd(), ".cache", "golden");
+  }
 
   const cache: GoldenCache = {
     async get(key) {

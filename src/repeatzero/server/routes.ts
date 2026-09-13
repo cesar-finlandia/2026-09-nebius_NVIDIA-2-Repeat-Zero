@@ -122,17 +122,29 @@ export async function handler(req: Request): Promise<Response> {
       }
       traceId = randomUUID();
       const ticket = body as Ticket;
+      const envelopes: Array<{
+        step_id: string;
+        status: "started" | "streaming" | "done" | "error";
+        payload: Record<string, unknown>;
+        timestamp: string;
+        sequence: number;
+        trace_id: string;
+        degraded?: boolean;
+      }> = [];
+      let seq = 0;
       const adapter = {
         publish: async (opts: { stepId: string; status: "started" | "streaming" | "done" | "error"; payload?: Record<string, unknown>; traceId?: string; degraded?: boolean }): Promise<void> => {
-          publishEnvelope({
+          const env = {
             step_id: opts.stepId,
             status: opts.status,
             payload: opts.payload ?? {},
             timestamp: new Date().toISOString(),
-            sequence: 0,
+            sequence: seq++,
             trace_id: opts.traceId ?? traceId,
             ...(opts.degraded === true ? { degraded: true } : {}),
-          });
+          };
+          envelopes.push(env);
+          publishEnvelope(env);
         },
         publishDelta: async (): Promise<void> => {},
         close: async (): Promise<void> => {},
@@ -154,7 +166,7 @@ export async function handler(req: Request): Promise<Response> {
         return jsonResponse(fallback, 200);
       }
       pushResult(triageResult);
-      return jsonResponse(triageResult, 200);
+      return jsonResponse({ ...triageResult, envelopes }, 200);
     }
     return jsonResponse({ error: "not_found", path }, 404);
   } catch {

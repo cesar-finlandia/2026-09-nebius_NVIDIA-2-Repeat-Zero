@@ -41,7 +41,7 @@ export function DraftReviewView(props: DraftReviewViewProps): React.JSX.Element 
   const [dialogOpen, setDialogOpen] = useState(false);
   if (props.result === null) {
     return (
-      <section aria-label="Draft review">
+      <section aria-label="Draft review" role="region">
         <p className="small">Pick a ticket from the queue to review its draft.</p>
       </section>
     );
@@ -51,7 +51,7 @@ export function DraftReviewView(props: DraftReviewViewProps): React.JSX.Element 
   const sent: boolean = result.decision.action === "auto_send";
   const draftEnvs: EventEnvelope[] = [...props.envelopes, ...draftEnvelopes(result)];
   return (
-    <section aria-label="Draft review">
+    <section aria-label="Draft review" role="region">
       <h2 className="h2 subject">{result.ticket.subject}</h2>
       <div className="rz-draft-cols">
         <div>

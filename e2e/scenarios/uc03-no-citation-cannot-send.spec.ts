@@ -20,27 +20,24 @@ function loadTickets(): FixtureTicket[] {
   }));
 }
 
-test("uc01 queue triages a shift", async ({ page, app }) => {
+test("uc03 no citation cannot send", async ({ page, app }) => {
   const tickets = loadTickets();
-  const repeat = tickets.find((t) => t.id === "t-repeat-01");
   const novel = tickets.find((t) => t.id === "t-novel-01");
-  if (!repeat || !novel) throw new Error("fixtures t-repeat-01 / t-novel-01 missing");
+  if (!novel) throw new Error("fixture t-novel-01 missing");
 
-  // Offline every ticket escalates (auto_send never happens offline): seed the
-  // queue backfill with one repeat + one novel ticket, each posted as a SINGLE
-  // ticket object (posting the whole array returns 400).
-  for (const ticket of [repeat, novel]) {
-    const posted = await page.request.post(`${app.baseURL}/api/tickets`, { data: ticket });
-    expect(posted.ok()).toBe(true);
-  }
+  const posted = await page.request.post(`${app.baseURL}/api/tickets`, { data: novel });
+  expect(posted.ok()).toBe(true);
 
   await page.goto(`${app.baseURL}/`);
-  await expect(page.getByRole("button", { name: "Queue" })).toBeVisible();
   await page.getByRole("button", { name: "Queue" }).click();
   const queue = page.getByRole("table", { name: "Ticket queue" });
   await expect(queue).toBeVisible({ timeout: 60000 });
-  await expect(page.getByRole("row").filter({ hasText: "needs you" }).first()).toBeVisible({
-    timeout: 120000,
-  });
-  await expect(page.getByRole("row").filter({ hasText: "working" })).toHaveCount(0);
+  const row = page.getByRole("row").filter({ hasText: novel.subject }).first();
+  await expect(row).toBeVisible({ timeout: 120000 });
+  await row.click();
+
+  const draft = page.getByRole("region", { name: "Draft review" });
+  await expect(draft).toBeVisible({ timeout: 60000 });
+  await expect(draft.getByText("This draft has no source, so it cannot be sent.")).toBeVisible({ timeout: 60000 });
+  await expect(draft.getByRole("button", { name: "Send reply" })).toHaveCount(0);
 });

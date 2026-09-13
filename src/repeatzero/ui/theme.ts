@@ -1,5 +1,3 @@
-import { TAXONOMY } from "../taxonomy.js";
-import { STEP_IDS } from "../pipeline/steps.js";
 import type { EventEnvelope } from "src/platform/transport";
 import type { TriageResult } from "../types.js";
 
@@ -47,6 +45,4 @@ export function applyTheme(id: ThemeId): void {
   }
 }
 
-void TAXONOMY;
-void STEP_IDS;
 export type { EventEnvelope, TriageResult };

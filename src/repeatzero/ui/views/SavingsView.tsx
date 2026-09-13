@@ -19,7 +19,7 @@ function tile(label: string, value: string, note: string): React.JSX.Element {
 export function SavingsView(props: SavingsViewProps): React.JSX.Element {
   if (props.savings === null) {
     return (
-      <section aria-label="Savings">
+      <section aria-label="Savings" role="region">
         <div className="rz-tiles">
           {["Tickets", "Auto-sent", "Deflection rate", "USD per ticket", "Hours saved", "Source lookups"].map((label) => (
             <div key={label} className="rz-tile">
@@ -38,7 +38,7 @@ export function SavingsView(props: SavingsViewProps): React.JSX.Element {
   const sentPct: number = (s.auto_sent / total) * 100;
   const escPct: number = 100 - sentPct;
   return (
-    <section aria-label="Savings">
+    <section aria-label="Savings" role="region">
       {props.degraded ? <p className="small">figures may be stale</p> : null}
       <div className="rz-tiles">
         {tile("Tickets", String(s.tickets), "completed tickets this session")}
