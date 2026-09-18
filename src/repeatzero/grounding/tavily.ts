@@ -71,6 +71,7 @@ export async function ground(
   ticket: Ticket,
   classification: TicketClassification,
   candidates: RetrievalCandidate[],
+  traceId?: string,
 ): Promise<Citation[]> {
   try {
     if (classification.label !== "repeat") {
@@ -114,9 +115,11 @@ export async function ground(
     if (isDegradedResult(raw)) {
       return [];
     }
-    const traceId: string = (ticket as { traceId?: string }).traceId ?? ticket.id;
+    // Metering key: explicit pipeline trace id wins; legacy ticket-carried
+    // id next; ticket id last (standalone callers).
+    const meter: string = traceId ?? (ticket as { traceId?: string }).traceId ?? ticket.id;
     try {
-      recordCall(traceId, {
+      recordCall(meter, {
         provider: "tavily",
         model: null,
         label: "ground",

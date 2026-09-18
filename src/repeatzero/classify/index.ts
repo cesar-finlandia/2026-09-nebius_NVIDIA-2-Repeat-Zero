@@ -23,7 +23,12 @@ function degraded(reason: string): TicketClassification {
 export async function classifyTicket(
   ticket: Ticket,
   candidates: RetrievalCandidate[],
+  traceId?: string,
 ): Promise<TicketClassification> {
+  // Metering key: the pipeline's trace id. Defaults to the ticket id so
+  // standalone callers (evals) keep working; the pipeline passes its own so
+  // recordCall lands in the same bucket finishTicket reads.
+  const meter: string = traceId ?? ticket.id;
   try {
     const lines: string = TAXONOMY.map((r) => `${r.id} — ${r.label} (${r.risk})`).join("\n");
     const sysRaw: string = readFileSync("engine/prompts/system.classify.md", "utf8");
@@ -65,7 +70,7 @@ export async function classifyTicket(
       max_tokens: 800,
       response_format: { type: "json_object" },
       label: "classify",
-      traceId: ticket.id,
+      traceId: meter,
     });
     if (isDegradedResult(raw)) {
       const reason: string = typeof (raw as { reason?: unknown }).reason === "string" ? (raw as { reason: string }).reason : "degraded";
@@ -76,13 +81,13 @@ export async function classifyTicket(
     try {
       parsed = JSON.parse(content);
     } catch {
-      return await repairOnce(system, content, schema as object, ticket);
+      return await repairOnce(system, content, schema as object, ticket, meter);
     }
     const result = validate(schema as object, parsed);
     if (result.valid) {
       return normalise(parsed);
     }
-    return await repairOnce(system, content, schema as object, ticket, result.errors);
+    return await repairOnce(system, content, schema as object, ticket, meter, result.errors);
   } catch {
     return degraded("exception");
   }
@@ -93,6 +98,7 @@ async function repairOnce(
   badText: string,
   schema: object,
   ticket: Ticket,
+  meter: string,
   errors?: Array<{ path: string; message: string; code: string }>,
 ): Promise<TicketClassification> {
   try {
@@ -107,7 +113,7 @@ async function repairOnce(
       max_tokens: 800,
       response_format: { type: "json_object" },
       label: "classify",
-      traceId: ticket.id,
+      traceId: meter,
     });
     if (isDegradedResult(retry)) {
       const reason: string = typeof (retry as { reason?: unknown }).reason === "string" ? (retry as { reason: string }).reason : "degraded";

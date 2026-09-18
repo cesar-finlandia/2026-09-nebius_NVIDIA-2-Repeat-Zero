@@ -68,7 +68,7 @@ export async function runTriage(
     await emit("retrieve", "done", { candidate_count: candidates.length, top_runbook_id: top });
 
     await emit("classify", "started", {});
-    const classification = await classifyTicket(ticket, candidates);
+    const classification = await classifyTicket(ticket, candidates, traceId);
     await emit("classify", "done", { ...classification }, classification.degraded === true ? true : undefined);
 
     let citations: Citation[] = [];
@@ -78,7 +78,7 @@ export async function runTriage(
       await emit("ground", "done", { citations: [], skipped: true }, classification.degraded === true ? true : undefined);
       groundWasEmpty = false;
     } else if (classification.label === "repeat") {
-      const grounded: Citation[] = await ground(ticket, classification, candidates);
+      const grounded: Citation[] = await ground(ticket, classification, candidates, traceId);
       if (grounded.length === 0 && candidates.length > 0) {
         citations = candidates.slice(0, 2).map((c) => ({
           url: c.doc.url,
