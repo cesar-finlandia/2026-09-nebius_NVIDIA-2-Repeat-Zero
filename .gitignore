@@ -66,3 +66,14 @@ test-results/
 node_modules/
 .e2e-evidence/
 script.md
+# Push hygiene (never to GitHub/Render): build output, sweep scratch, local runs
+dist/
+.commandcode/
+.planner_prompt_*.md
+run_planner.conf
+run_sequential.conf
+run_sequential_md.conf
+.run_step_records.txt
+e2e/e2e/
+artifacts/
+docs/architecture_summary.txt
