@@ -70,6 +70,7 @@
     "jsdom": "^25.0.1",
     "json-schema-to-typescript": "^15.0.4",
     "playwright": "^1.62.1",
+    "playwright-core": "1.62.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "^7.0.2",
