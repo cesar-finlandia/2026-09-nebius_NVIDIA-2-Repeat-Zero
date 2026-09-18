@@ -29,10 +29,16 @@ test("smoke", async ({ page, app }) => {
   expect(Array.isArray(healthJson.models)).toBe(true);
 
   await page.goto(`${BASE}/`);
-  await expect(page.getByRole("button", { name: "Queue" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Draft review" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Escalations" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Savings" })).toBeVisible();
+  // Scope to the nav landmark: the console legitimately carries several
+  // buttons whose accessible names contain "queue" outside the nav
+  // ("Clear the queue", the queue help "What is the queue?"), and the
+  // Escalations button gains a count suffix once tickets escalate —
+  // so landmark scoping (not exact names) is the stable assertion.
+  const nav = page.getByRole("navigation", { name: "RepeatZero views" });
+  await expect(nav.getByRole("button", { name: "Queue" })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Draft review" })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Escalations" })).toBeVisible();
+  await expect(nav.getByRole("button", { name: "Savings" })).toBeVisible();
 
   // Queue rows render ONLY from the GET /api/queue backfill (the live SSE
   // stream is empty in tests), so POST a SINGLE ticket object first — posting
@@ -45,7 +51,7 @@ test("smoke", async ({ page, app }) => {
   expect(posted.ok()).toBe(true);
 
   await page.goto(`${BASE}/`);
-  await page.getByRole("button", { name: "Queue" }).click();
+  await page.getByRole("navigation", { name: "RepeatZero views" }).getByRole("button", { name: "Queue" }).click();
   const queue = page.getByRole("table", { name: "Ticket queue" });
   await expect(queue).toBeVisible({ timeout: 60000 });
   const rowCount: number = await queue.getByRole("row").count();
