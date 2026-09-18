@@ -28,7 +28,7 @@ Works with zero credentials.
 ## Live run
 Requires both keys.
 ```
-npm run triage:demo
+npm run queue:demo
 ```
 
 ## Deploy

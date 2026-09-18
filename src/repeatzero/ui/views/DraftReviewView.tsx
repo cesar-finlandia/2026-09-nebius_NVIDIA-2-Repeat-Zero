@@ -4,6 +4,7 @@ import { CitationDisplay, StreamingTextRenderer } from "src/platform/ui";
 import type { EventEnvelope } from "src/platform/transport";
 import type { TriageResult } from "../../types.js";
 import { SendDialog } from "../components/SendDialog.js";
+import { HelpPopover } from "../components/HelpPopover.js";
 
 export interface DraftReviewViewProps {
   result: TriageResult | null;
@@ -66,9 +67,9 @@ export function DraftReviewView(props: DraftReviewViewProps): React.JSX.Element 
           </p>
           <StreamingTextRenderer envelopes={draftEnvs} stepId="draft" />
           <p className="prose">{result.draft.body}</p>
-          <section aria-label="Sources" role="region">
-            <div role="region" aria-label="Sources">
-              <h3 className="h3">Sources</h3>
+          <section aria-label="Sources" role="region" data-surface="sources">
+            <div role="region" aria-label="Sources" data-result-region="sources">
+              <h3 className="h3">Sources <HelpPopover regionId="sources" /></h3>
               {cited ? (
                 <CitationDisplay envelopes={draftEnvs} />
               ) : (

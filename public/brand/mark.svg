@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img" aria-label="RepeatZero mark">
+  <!-- The zero: the queue, cleared. -->
+  <circle cx="16" cy="16" r="11.25" stroke="currentColor" stroke-width="3"/>
+  <!-- Two lanes inside it: the long quiet one the tool answers, the short one left
+       for a human. The contrast between them is the product. -->
+  <rect x="9.25" y="12.25" width="13.5" height="3" rx="1.5" fill="currentColor"/>
+  <rect x="9.25" y="19" width="6.75" height="3" rx="1.5" fill="currentColor"/>
+</svg>

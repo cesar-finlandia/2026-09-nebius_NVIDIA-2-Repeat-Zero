@@ -17,9 +17,30 @@ const server = createServer((req, res) => {
     });
     handler(request)
       .then(async (response) => {
-        res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
-        const text: string = await response.text();
-        res.end(text);
+        const headers = Object.fromEntries(response.headers.entries());
+        res.writeHead(response.status, headers);
+        const body = response.body;
+        if (body === null) {
+          res.end();
+          return;
+        }
+        // Stream chunk-by-chunk: buffering (response.text()) never terminates
+        // for the infinite SSE stream served by GET /api/stream.
+        const reader = body.getReader() as ReadableStreamDefaultReader<Uint8Array>;
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            res.write(value as Uint8Array);
+          }
+          res.end();
+        } catch {
+          try {
+            res.end();
+          } catch {
+            // client already gone
+          }
+        }
       })
       .catch(() => {
         res.writeHead(500, { "Content-Type": "application/json" });

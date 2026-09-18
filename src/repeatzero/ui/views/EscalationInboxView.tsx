@@ -30,12 +30,16 @@ export function EscalationInboxView(props: EscalationInboxViewProps): React.JSX.
             {reason} ({items.length})
           </h3>
           {items.map((item) => (
-            <article key={item.trace_id}>
+            <article key={item.trace_id} data-surface={`escalation-${item.trace_id}`}>
               <h4 className="subject">{item.ticket.subject}</h4>
-              <p className="prose">{item.classification.rationale}</p>
+              <p className="prose rz-clamp">{item.classification.rationale}</p>
+              <details>
+                <summary className="support">Show more</summary>
+                <p className="prose">{item.classification.rationale}</p>
+              </details>
               <div className="small">
                 {item.citations.map((c) => (
-                  <a key={c.url} href={c.url}>
+                  <a key={c.url} href={c.url} className="rz-source-chip">
                     {c.title}
                   </a>
                 ))}

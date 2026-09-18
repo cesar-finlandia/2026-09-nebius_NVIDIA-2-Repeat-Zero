@@ -61,7 +61,7 @@ export function streamResponse(traceId: string | null): Response {
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
       for (const frame of frames) {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(frame)}\n\n`));
+        controller.enqueue(encoder.encode(`event: envelope\ndata: ${JSON.stringify(frame)}\n\n`));
       }
       heartbeat = setInterval(() => {
         try {

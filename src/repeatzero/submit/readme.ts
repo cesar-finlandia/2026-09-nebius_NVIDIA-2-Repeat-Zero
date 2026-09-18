@@ -22,7 +22,7 @@ export function buildReadme(input: ReadmeInput): ReadmeOutput {
     input.ledgerExample === null ||
     typeof (input.ledgerExample as unknown as Record<string, unknown>)["tickets"] !== "number";
   const lines: string[] = [];
-  lines.push("# RepeatZero — cited repeat-ticket triage");
+  lines.push("# RepeatZero — cited answers for repeat tickets");
   lines.push("");
   lines.push("## Prerequisites");
   lines.push("- Node 20 (see `.nvmrc`)");
@@ -52,7 +52,7 @@ export function buildReadme(input: ReadmeInput): ReadmeOutput {
   lines.push("## Live run");
   lines.push("Requires both keys.");
   lines.push("```");
-  lines.push("npm run triage:demo");
+  lines.push("npm run queue:demo");
   lines.push("```");
   lines.push("");
   lines.push("## Deploy");

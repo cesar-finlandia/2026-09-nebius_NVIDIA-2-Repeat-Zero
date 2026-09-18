@@ -10,7 +10,7 @@ export function buildSubmissionDoc(input: SubmissionInput): SubmissionOutput {
   const pitch: string =
     typeof input.pitch === "string" && input.pitch.trim() !== ""
       ? input.pitch
-      : "Cited repeat-ticket triage for internal IT support leads.";
+      : "Cited answers for repeat tickets, for internal IT support leads.";
   const demoUrl: string = typeof input.demoUrl === "string" ? input.demoUrl : "";
   const repoUrl: string = typeof input.repoUrl === "string" ? input.repoUrl : "";
   const superId: string = typeof input.models?.super === "string" ? input.models.super : "";
@@ -57,7 +57,7 @@ export function buildSubmissionDoc(input: SubmissionInput): SubmissionOutput {
   const parts: string[] = [];
   parts.push(`# ${title}\n\n${pitch}`);
   parts.push(
-    `# Track: Best Apps and Agents\n\nA triage tool an internal IT lead would use daily, inside the chat workflow they already live in.`,
+    `# Track: Best Apps and Agents\n\nA queue tool an internal IT lead would use daily, inside the chat workflow they already live in.`,
   );
   parts.push(
     `# What it does\n\n- classify repeat-vs-novel\n- ground repeat candidates with live web search\n- draft cited resolution\n- deterministic policy gate auto-send vs escalate`,
@@ -85,7 +85,7 @@ export function buildSubmissionDoc(input: SubmissionInput): SubmissionOutput {
     `# Tavily bonus\n\nFunctional runtime ${endpoint} with TAVILY_API_KEY; ${citations} citations on the example query "${exampleQuery}".`,
   );
   parts.push(
-    `# Uniqueness vs entry 1\n\nDifferent product (repeat-ticket triage vs merge-readiness), different track, different repository, different video, different evidence trail. The multiple-submission rule allows two entries only if each is unique and substantially different.`,
+    `# Uniqueness vs entry 1\n\nDifferent product (repeat-ticket answering vs merge-readiness), different track, different repository, different video, different evidence trail. The multiple-submission rule allows two entries only if each is unique and substantially different.`,
   );
   parts.push(
     `# Feedback\n\n## Token Factory\n\n${feedback.tokenFactory}\n\n## Nebius AI Cloud\n\n${feedback.nebiusCloud}\n\n## NVIDIA models\n\n${feedback.nvidiaModels}`,

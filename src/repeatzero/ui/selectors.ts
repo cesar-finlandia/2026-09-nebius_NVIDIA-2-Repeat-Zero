@@ -118,15 +118,30 @@ export function selectEscalations(queue: TriageResult[]): Map<string, TriageResu
   return groups;
 }
 
+function degradedWhat(e: EventEnvelope): string {
+  const p = (e.payload ?? {}) as Record<string, unknown>;
+  const reason: string = typeof p["degradation_reason"] === "string" ? (p["degradation_reason"] as string) : "";
+  // Internal reason tokens never reach the screen verbatim: map the known ones
+  // to product words; anything else falls back to a complete sentence.
+  if (reason === "forced_degraded") return "offline fallback in use";
+  if (reason !== "") return reason.replace(/_/g, " ");
+  const rationale: string = typeof p["rationale"] === "string" ? (p["rationale"] as string) : "";
+  if (rationale !== "") return rationale.replace(/_/g, " ");
+  if ((p["skipped"] as boolean) === true) return "skipped, escalating with full context";
+  return e.status === "done" ? "completed without live data" : e.status;
+}
+
 export function selectDegraded(envelopes: EventEnvelope[]): Array<{ step: string; detail: string }> {
   const seen = new Set<string>();
   const out: Array<{ step: string; detail: string }> = [];
   for (const e of envelopes) {
     if (!isDegradedEnvelope(e)) continue;
-    const key: string = `${e.step_id}:${e.status}`;
+    if (e.status === "started" || e.status === "streaming") continue;
+    const detail: string = degradedWhat(e);
+    const key: string = `${e.step_id}:${detail}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ step: e.step_id, detail: e.status });
+    out.push({ step: e.step_id, detail });
   }
   return out;
 }

@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { MessageSet } from "./MessageSet.js";
 
 export interface DegradedBannerProps {
   reasons: Array<{ step: string; detail: string }>;
@@ -10,23 +11,28 @@ export function DegradedBanner(props: DegradedBannerProps): React.JSX.Element {
   }
   const visible = props.reasons.slice(0, 3);
   const extra: number = props.reasons.length - visible.length;
+  const detail = visible.map((r) => ({
+    step: r.step,
+    what: r.detail === "" ? "no reason recorded" : r.detail,
+  }));
   return (
-    <div className="rz-banner" role="status" aria-live="polite">
-      {visible.map((r, i) => (
-        <div key={`${r.step}:${i}`} className="small">
-          {r.step} degraded — {r.detail}. Other views remain live.
-        </div>
-      ))}
+    <div className="rz-banner-slot">
+      <MessageSet
+        tier="page"
+        title="Running offline — drafts are not being sent"
+        detail={detail}
+      />
       {extra > 0 ? (
         <details>
-          <summary className="small">and {extra} more</summary>
+          <summary className="support">and {extra} more</summary>
           {props.reasons.slice(3).map((r, i) => (
-            <div key={`extra:${i}`} className="small">
-              {r.step} degraded — {r.detail}. Other views remain live.
-            </div>
+            <p key={`extra:${i}`} className="support">
+              {r.step} — {r.detail === "" ? "no reason recorded" : r.detail}
+            </p>
           ))}
         </details>
       ) : null}
+      <p className="support">Other views remain live.</p>
     </div>
   );
 }

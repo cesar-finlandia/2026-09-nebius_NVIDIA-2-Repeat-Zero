@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   build: {
     outDir: "dist",
     rollupOptions: {
@@ -18,6 +18,10 @@ export default defineConfig({
     alias: {
       src: `${root}src`,
       examples: `${root}examples`,
+      // Client bundle only: answer the chassis transport's single schema-file
+      // read without node:fs (see src/platform-shims/browser-fs.ts). Scoped to
+      // `vite build` so vite-node server runtimes keep the real node:fs.
+      ...(command === "build" ? { "node:fs": `${root}src/platform-shims/browser-fs.ts` } : {}),
     },
   },
-});
+}));

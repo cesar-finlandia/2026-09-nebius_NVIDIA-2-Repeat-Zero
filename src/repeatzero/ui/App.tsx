@@ -8,6 +8,9 @@ import type { TriageResult } from "../types.js";
 import { applyTheme, initialTheme } from "./theme.js";
 import type { ThemeId } from "./theme.js";
 import { SideNav } from "./components/SideNav.js";
+import { AppBar } from "./components/AppBar.js";
+import { ExplainerPanel } from "./components/ExplainerPanel.js";
+import { HelpPopover } from "./components/HelpPopover.js";
 import { DegradedBanner } from "./components/DegradedBanner.js";
 import { WorkIndicator } from "./components/WorkIndicator.js";
 import { QueueView } from "./views/QueueView.js";
@@ -43,6 +46,34 @@ export function App(props: AppProps): React.JSX.Element {
   const [firstEnvelopeAt, setFirstEnvelopeAt] = useState<number | null>(null);
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const [savingsDegraded, setSavingsDegraded] = useState(false);
+  const [explainerOpen, setExplainerOpen] = useState(false);
+  const [runningSample, setRunningSample] = useState(false);
+  const [sampleError, setSampleError] = useState<string | null>(null);
+
+  const runSampleTicket = async (): Promise<void> => {
+    setRunningSample(true);
+    setSampleError(null);
+    try {
+      const res = await fetch(`${props.apiBaseUrl}/api/tickets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: `sample-${Date.now()}`,
+          subject: "Password reset link expired",
+          body: "Requester followed the reset link twice and it expired both times. Known issue with a runbook.",
+          requester: "maya@example.com",
+          created_at: new Date().toISOString(),
+        }),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!res.ok) throw new Error(`sample_${res.status}`);
+    } catch (e: unknown) {
+      setSampleError("That run did not start — check the connection and try again.");
+      void e;
+    } finally {
+      setRunningSample(false);
+    }
+  };
 
   useEffect(() => {
     applyTheme(initialTheme());
@@ -140,9 +171,9 @@ export function App(props: AppProps): React.JSX.Element {
   const activity = useMemo(() => selectActivityLine(envelopes), [envelopes]);
   const bannerReasons = useMemo(() => {
     if (queueBackfillFailed) {
-      return [{ step: "queue", detail: "Queue history unavailable — showing live tickets only. Other views remain live." }];
+      return [{ step: "queue", detail: "Queue history unavailable — showing live tickets only" }];
     }
-    return degradedReasons.map((r) => ({ step: r.step, detail: `${r.detail}. Other views remain live.` }));
+    return degradedReasons.map((r) => ({ step: r.step, detail: r.detail }));
   }, [degradedReasons, queueBackfillFailed]);
 
   const elapsedS: number = firstEnvelopeAt === null ? 0 : (nowMs - firstEnvelopeAt) / 1000;
@@ -150,8 +181,7 @@ export function App(props: AppProps): React.JSX.Element {
   const stalledS: number | null =
     newestAt !== null && Number.isFinite(newestAt) ? Math.max(0, (nowMs - newestAt) / 1000) : null;
 
-  const onSend = (traceId: string): void => {
-    setSending(true);
+  const onSend = (traceId: string): void => {    setSending(true);
     setSendError(null);
     fetch(`${props.apiBaseUrl}/api/tickets`, {
       method: "POST",
@@ -168,15 +198,27 @@ export function App(props: AppProps): React.JSX.Element {
 
   return (
     <div className="rz-layout">
-      <SideNav
-        active={activeView}
-        escalationCount={escalationCount}
-        onNavigate={setActiveView}
+      <AppBar
+        onExplainer={() => setExplainerOpen(true)}
         theme={theme}
         onThemeChange={(t) => {
           setThemeState(t);
           applyTheme(t);
         }}
+      />
+      <ExplainerPanel
+        open={explainerOpen}
+        onClose={() => setExplainerOpen(false)}
+        onTryIt={() => {
+          setExplainerOpen(false);
+          setActiveView("queue");
+          void runSampleTicket();
+        }}
+      />
+      <SideNav
+        active={activeView}
+        escalationCount={escalationCount}
+        onNavigate={setActiveView}
         status={stream.status}
         onReconnect={stream.reconnect}
         corpusAgeHours={null}
@@ -187,30 +229,65 @@ export function App(props: AppProps): React.JSX.Element {
         <DegradedBanner reasons={bannerReasons} />
         <WorkIndicator active={envelopes.length > 0} line={activity} elapsedS={elapsedS} stalledS={stalledS} />
         {activeView === "queue" ? (
-          <QueueView
-            rows={rows}
-            selectedTraceId={selectedTraceId}
-            onSelect={(t) => {
-              setSelectedTraceId(t);
-              setActiveView("draft");
-            }}
-            filter={filter}
-            onFilter={setFilter}
-          />
+          <div data-result-region="queue">
+            <div className="rz-view-header">
+              <h1 className="h1">Queue</h1>
+              <HelpPopover regionId="queue" />
+              <button
+                type="button"
+                className="rz-run-button"
+                disabled={runningSample}
+                onClick={() => void runSampleTicket()}
+              >
+                Clear the queue
+              </button>
+              {sampleError !== null ? <p className="support">{sampleError}</p> : null}
+            </div>
+            <QueueView
+              rows={rows}
+              selectedTraceId={selectedTraceId}
+              onSelect={(t) => {
+                setSelectedTraceId(t);
+                setActiveView("draft");
+              }}
+              filter={filter}
+              onFilter={setFilter}
+            />
+          </div>
         ) : null}
         {activeView === "draft" ? (
-          <DraftReviewView result={draft} envelopes={envelopes} onSend={onSend} sending={sending} error={sendError} />
+          <div data-result-region="draft-review">
+            <div className="rz-view-header">
+              <h1 className="h1">Draft review</h1>
+              <HelpPopover regionId="draft-review" />
+            </div>
+            <DraftReviewView result={draft} envelopes={envelopes} onSend={onSend} sending={sending} error={sendError} />
+          </div>
         ) : null}
         {activeView === "escalations" ? (
-          <EscalationInboxView
-            items={[...escalations.values()].flat()}
-            onSelect={(t) => {
-              setSelectedTraceId(t);
-              setActiveView("draft");
-            }}
-          />
+          <div data-result-region="escalation-inbox">
+            <div className="rz-view-header">
+              <h1 className="h1">Escalations</h1>
+              <HelpPopover regionId="escalation-inbox" />
+            </div>
+            <EscalationInboxView
+              items={[...escalations.values()].flat()}
+              onSelect={(t) => {
+                setSelectedTraceId(t);
+                setActiveView("draft");
+              }}
+            />
+          </div>
         ) : null}
-        {activeView === "savings" ? <SavingsView savings={savings} degraded={savingsDegraded} /> : null}
+        {activeView === "savings" ? (
+          <div data-result-region="savings">
+            <div className="rz-view-header">
+              <h1 className="h1">Savings</h1>
+              <HelpPopover regionId="savings" />
+            </div>
+            <SavingsView savings={savings} degraded={savingsDegraded} />
+          </div>
+        ) : null}
       </main>
     </div>
   );

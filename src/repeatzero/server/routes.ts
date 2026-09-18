@@ -66,6 +66,14 @@ export async function handler(req: Request): Promise<Response> {
         return new Response(data as BodyInit, { status: 200, headers: { "Content-Type": contentType, ...headers } });
       }
     }
+    if (method === "GET" && (path === "/favicon.svg" || path.startsWith("/brand/"))) {
+      const filePath: string = join(process.cwd(), "public", path.slice(1));
+      if (existsSync(filePath)) {
+        const data: Buffer = readFileSync(filePath) as Buffer;
+        const contentType: string = path.endsWith(".css") ? "text/css" : "image/svg+xml";
+        return new Response(data as BodyInit, { status: 200, headers: { "Content-Type": contentType, ...headers } });
+      }
+    }
     if (method === "GET" && path === "/healthz") {
       const now: number = Date.now();
       if (healthCache !== null && now - healthCache.at_ms < HEALTH_CACHE_TTL_MS) {
