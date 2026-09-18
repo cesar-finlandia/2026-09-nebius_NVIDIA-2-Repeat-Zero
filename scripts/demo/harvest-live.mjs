@@ -86,8 +86,11 @@ async function runOnce(runNo) {
 
 const run1 = await runOnce(1);
 const run2 = await runOnce(2);
-const head = (r) => JSON.stringify({ a: r.auto_sent, e: r.escalated, d: r.deflection_rate_1dp, u: r.usd_per_ticket_4dp });
+const head = (r) => JSON.stringify(r.per_ticket.map((t) => [t.ticket_id, t.label, t.action, t.citation_count]));
+// Agreement is structural (labels, actions, citation counts). USD/token
+// figures vary run to run and are quoted as a range per DP-SCRIPT §7.
 const agreed = head(run1) === head(run2);
+const usdVals = [run1, run2].map((r) => r.usd_per_ticket_4dp);
 const all1 = run1.per_ticket;
 // Featured: prefer repeat + cited + auto-sent, else first ticket. Contrast: first escalated.
 const featured = all1.find((t) => t.label === "repeat" && t.citation_count > 0 && t.action === "auto_send")
@@ -102,6 +105,7 @@ const ledger = {
   modelIds,
   agreed,
   usdPerTicket: run1.usd_per_ticket_4dp,
+  usdPerTicketRange: [Math.min(...usdVals), Math.max(...usdVals)],
   deflectionRate: run1.deflection_rate_1dp,
   params: {
     tickets: TICKETS,
