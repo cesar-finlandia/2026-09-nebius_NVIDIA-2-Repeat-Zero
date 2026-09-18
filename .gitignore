@@ -77,3 +77,8 @@ run_sequential_md.conf
 e2e/e2e/
 artifacts/
 docs/architecture_summary.txt
+# Root authoring inputs — planning material, not part of the product (public repo)
+# (same precedent as design_documents/* above)
+/engine-building-prompt.md
+/hackathon_brief.md
+/winning_project_plan.md
