@@ -198,7 +198,13 @@ export function retrieve(ticket: Ticket, k?: number): RetrievalCandidate[] {
   const body: string = typeof ticket.body === "string" ? ticket.body : "";
   const qterms: string[] = tokenise(`${subject} ${body}`);
   if (MEMO.N === 0) {
-    return [];
+    // Lazy boot: server processes never call loadCorpus (only the nightly
+    // job does, in its own process), so the first retrieval in a fresh
+    // process loads the frozen runbook set. Synchronous local files only.
+    loadCorpus();
+    if (MEMO.N === 0) {
+      return [];
+    }
   }
   if (qterms.length === 0) {
     return [];
