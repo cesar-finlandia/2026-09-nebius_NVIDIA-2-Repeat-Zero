@@ -1,0 +1,62 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>RepeatZero — architecture</title>
+<style>
+  :root{ --bg:#FAF9F7; --surface:#FFFFFF; --ink:#1B1A17; --muted:#5F5A52; --accent:#16706B; --amber:#A25A0C; }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:1920px;height:1080px;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+  .stage{width:1920px;height:1080px;display:flex;flex-direction:column;padding:64px 72px;gap:28px;overflow:hidden}
+  .title{margin:0;font-size:64px;font-weight:800;letter-spacing:-0.02em;line-height:1.2}
+  .subtitle{margin:0;font-size:28px;color:var(--muted);line-height:1.35}
+  .flow{flex:1;display:grid;grid-template-columns:300px 1fr 300px;gap:32px;min-height:0}
+  .col{background:var(--surface);border-radius:20px;padding:32px;display:flex;flex-direction:column;gap:20px;min-width:0}
+  .col h2{margin:0;font-size:30px;font-weight:800}
+  .col .tag{font-size:22px;color:var(--muted);margin:0}
+  .node{border:3px solid var(--accent);border-radius:14px;padding:16px 18px}
+  .node.amber{border-color:var(--amber)}
+  .node h3{margin:0;font-size:26px;font-weight:800}
+  .node p{margin:6px 0 0;font-size:22px;color:var(--muted);line-height:1.35}
+  .node p b{color:var(--ink)}
+  .fan{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .fan .node{padding:12px 14px}
+  .fan .node h3{font-size:23px}
+  .fan .node p{font-size:20px}
+  .arrowline{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:22px}
+  .arrowline::before{content:"";flex:1;height:3px;background:var(--accent);border-radius:2px}
+  .foot{margin:0;font-size:24px;color:var(--muted);line-height:1.4;background:var(--surface);border-radius:16px;padding:20px 28px}
+  .foot b{color:var(--accent)}
+</style></head><body>
+  <div class="stage">
+    <div>
+      <p class="title">RepeatZero — how a ticket becomes an answer</p>
+      <p class="subtitle">Live cited triage: Token Factory + Nemotron Super/Nano + Tavily grounding &middot; Best Apps and Agents</p>
+    </div>
+    <div class="flow">
+      <div class="col">
+        <h2>1 &middot; In</h2>
+        <p class="tag">One Docker image, live demo URL</p>
+        <div class="node"><h3>POST /api/tickets</h3><p>Validated <b>Ticket</b> in, <b>TriageResult</b> out; queue, savings, health, stream, events</p></div>
+        <div class="arrowline">to pipeline</div>
+        <div class="node"><h3>Nightly job</h3><p>Re-indexes the 12 runbooks at 03:00 UTC</p></div>
+      </div>
+      <div class="col">
+        <h2>2 &middot; runTriage()</h2>
+        <p class="tag">One trace id, typed envelopes per step</p>
+        <div class="fan">
+          <div class="node"><h3>Retrieve</h3><p>Offline lexical search over runbooks, <b>no network</b></p></div>
+          <div class="node"><h3>Classify</h3><p><b>Nemotron Super</b> via Token Factory: repeat / novel + taxonomy</p></div>
+          <div class="node"><h3>Ground</h3><p><b>Tavily</b> citations for repeats; novel skips honestly</p></div>
+          <div class="node"><h3>Draft</h3><p><b>Super</b> drafts, Nano pings; <b>no citation, no send</b></p></div>
+        </div>
+        <div class="node amber"><h3>Policy gate &middot; ledger</h3><p><b>Deterministic decide()</b> (no I/O): send or escalate; every call costed per ticket</p></div>
+      </div>
+      <div class="col">
+        <h2>3 &middot; Out</h2>
+        <p class="tag">Streamed to the console</p>
+        <div class="node"><h3>Event envelopes</h3><p>SSE stream + reconnect snapshot per trace</p></div>
+        <div class="arrowline">to console</div>
+        <div class="node"><h3>Operator console</h3><p>Queue &rarr; draft Sources &rarr; escalation inbox &rarr; savings tiles</p></div>
+      </div>
+    </div>
+    <p class="foot"><b>Degraded input never auto-sends:</b> any failed call returns a typed degraded result, the step envelope carries it, and the gate forces escalate. Measured live: 1 sent + 1 escalated, ~1&cent;/ticket.</p>
+  </div>
+</body></html>
